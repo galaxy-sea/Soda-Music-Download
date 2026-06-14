@@ -1,13 +1,21 @@
 // ==UserScript==
-// @name         Soda Music Download
+// @name         Soda(qishui) Music Download
 // @name:zh-CN   汽水音乐下载
 // @namespace    https://github.com/
+// @author       ChangJin Wei (魏昌进)
 // @version      0.1.0
 // @description  Add a download button to Qishui share track pages.
+// @homepageURL  https://github.com/galaxy-sea/Soda-Music-Download
+// @supportURL   https://github.com/galaxy-sea/Soda-Music-Download/issues
+// @updateURL    https://raw.githubusercontent.com/galaxy-sea/Soda-Music-Download/main/userscript/qishui-download.user.js
+// @downloadURL  https://raw.githubusercontent.com/galaxy-sea/Soda-Music-Download/main/userscript/qishui-download.user.js
 // @match        https://music.douyin.com/qishui/share/track*
 // @match        https://www.qishui.com/share/track*
 // @run-at       document-start
 // @grant        GM_download
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @grant        GM_openInTab
 // @grant        unsafeWindow
 // @connect      *
 // ==/UserScript==
@@ -20,10 +28,86 @@
 
   const pageWindow = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
   const { buildFilename, installDownloadButton } = globalThis.SodaMusicDownloadUtils;
+  const NOTICE_SHOWN_KEY = "soda_music_download_install_notice_shown";
+
+  function openInstallNoticeOnce() {
+    if (typeof GM_getValue !== "function" || typeof GM_setValue !== "function") {
+      return;
+    }
+
+    if (GM_getValue(NOTICE_SHOWN_KEY, false)) {
+      return;
+    }
+
+    GM_setValue(NOTICE_SHOWN_KEY, true);
+
+    const html = `<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>汽水音乐下载</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #1f2328;
+        background: #f6f8fa;
+      }
+
+      main {
+        box-sizing: border-box;
+        width: min(720px, calc(100vw - 32px));
+        margin: 56px auto;
+        padding: 32px;
+        border: 1px solid #d8dee4;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 26px;
+        line-height: 1.3;
+      }
+
+      p, li {
+        font-size: 15px;
+        line-height: 1.7;
+      }
+
+      code {
+        padding: 2px 5px;
+        border-radius: 4px;
+        background: #f6f8fa;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Soda(qishui) Music Download / 汽水音乐下载</h1>
+      <p>安装完成。打开汽水音乐分享页后，页面标题右侧会出现“立即下载”按钮。</p>
+      <ul>
+        <li>支持 <code>music.douyin.com/qishui/share/track</code></li>
+        <li>支持 <code>www.qishui.com/share/track</code></li>
+        <li>点击“立即下载”后才会开始下载音频。</li>
+      </ul>
+    </main>
+  </body>
+</html>`;
+    const noticeUrl = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+
+    if (typeof GM_openInTab === "function") {
+      GM_openInTab(noticeUrl, { active: true, insert: true });
+      return;
+    }
+
+    window.open(noticeUrl, "_blank", "noopener,noreferrer");
+  }
 
   function download(track) {
     if (typeof GM_download !== "function") {
-      console.error("[Soda Music Download] GM_download is unavailable.");
+      console.error("[Soda(qishui) Music Download] GM_download is unavailable.");
       return;
     }
 
@@ -32,7 +116,7 @@
       name: buildFilename(track),
       saveAs: false,
       onerror: (error) => {
-        console.error("[Soda Music Download] Download failed:", error);
+        console.error("[Soda(qishui) Music Download] Download failed:", error);
       },
     });
   }
@@ -42,4 +126,6 @@
     preventDuplicate: true,
     onDownload: download,
   });
+
+  openInstallNoticeOnce();
 })();
