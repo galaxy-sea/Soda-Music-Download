@@ -3,7 +3,7 @@
 // @name:zh-CN   汽水音乐下载
 // @namespace    https://github.com/
 // @author       ChangJin Wei (魏昌进)
-// @version      2026.614.12144
+// @version      2026.614.12156
 // @description  Add a download button to Qishui share track pages.
 // @homepageURL  https://github.com/galaxy-sea/Soda-Music-Download
 // @supportURL   https://github.com/galaxy-sea/Soda-Music-Download/issues
@@ -254,6 +254,7 @@
           <img src="https://i.postimg.cc/mk8vWPht/Ali-Pay.webp" alt="支付宝收款码" width="220">
           <img src="https://i.postimg.cc/0jcT1zrz/We-Chat-Pay.webp" alt="微信收款码" width="220">
         </p>
+        <h2><a href="https://github.com/galaxy-sea/Soda-Music-Download/issues/new">BUG修复，问题访问，点这里</a></h2>
       </div>
     </div>
   </main>
