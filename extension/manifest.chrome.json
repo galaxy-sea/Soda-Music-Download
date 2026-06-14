@@ -11,6 +11,16 @@
     "64": "icons/icon120.png",
     "120": "icons/icon120.png"
   },
+  "action": {
+    "default_title": "__MSG_extensionName__",
+    "default_icon": {
+      "16": "icons/icon120.png",
+      "32": "icons/icon120.png",
+      "48": "icons/icon120.png",
+      "64": "icons/icon120.png",
+      "120": "icons/icon120.png"
+    }
+  },
   "permissions": [
     "downloads"
   ],

@@ -4,6 +4,7 @@ set -eu
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 EXTENSION_DIR="$ROOT_DIR/extension"
 EXTENSION_SHARED="$ROOT_DIR/extension/shared/download-utils.js"
+WELCOME_HTML="$ROOT_DIR/extension/shared/welcome.html"
 CHROME_MANIFEST_TEMPLATE="$EXTENSION_DIR/manifest.chrome.json"
 FIREFOX_MANIFEST_TEMPLATE="$EXTENSION_DIR/manifest.firefox.json"
 EXTENSION_MANIFEST="$EXTENSION_DIR/manifest.json"
@@ -27,13 +28,21 @@ cleanup_manifest() {
 
 trap cleanup_manifest EXIT
 
-sed \
-  -e "s|^// @version[[:space:]]*.*|// @version      $VERSION|" \
-  -e "/^  __DOWNLOAD_UTILS__$/{
-    r $EXTENSION_SHARED
-    d
-  }" \
-  "$TEMPLATE" > "$OUTPUT"
+VERSION="$VERSION" EXTENSION_SHARED="$EXTENSION_SHARED" WELCOME_HTML="$WELCOME_HTML" perl -0pe '
+  BEGIN {
+    local $/;
+    open my $utils_fh, "<", $ENV{EXTENSION_SHARED} or die $!;
+    $utils = <$utils_fh>;
+    open my $welcome_fh, "<", $ENV{WELCOME_HTML} or die $!;
+    $welcome = <$welcome_fh>;
+    $welcome =~ s/\\/\\\\/g;
+    $welcome =~ s/`/\\`/g;
+    $welcome = "`$welcome`";
+  }
+  s|^// \@version\s+.*$|"// \@version      " . $ENV{VERSION}|me;
+  s/^  __DOWNLOAD_UTILS__$/$utils/m;
+  s/__INSTALL_NOTICE_HTML__/$welcome/g;
+' "$TEMPLATE" > "$OUTPUT"
 
 printf "Generated %s\n" "$OUTPUT"
 printf "Version %s\n" "$VERSION"

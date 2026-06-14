@@ -29,6 +29,7 @@
   const pageWindow = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
   const { buildFilename, installDownloadButton } = globalThis.SodaMusicDownloadUtils;
   const NOTICE_SHOWN_KEY = "soda_music_download_install_notice_shown";
+  const INSTALL_NOTICE_HTML = __INSTALL_NOTICE_HTML__;
 
   function openInstallNoticeOnce() {
     if (typeof GM_getValue !== "function" || typeof GM_setValue !== "function") {
@@ -41,61 +42,7 @@
 
     GM_setValue(NOTICE_SHOWN_KEY, true);
 
-    const html = `<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>汽水音乐下载</title>
-    <style>
-      body {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        color: #1f2328;
-        background: #f6f8fa;
-      }
-
-      main {
-        box-sizing: border-box;
-        width: min(720px, calc(100vw - 32px));
-        margin: 56px auto;
-        padding: 32px;
-        border: 1px solid #d8dee4;
-        border-radius: 8px;
-        background: #fff;
-      }
-
-      h1 {
-        margin: 0 0 8px;
-        font-size: 26px;
-        line-height: 1.3;
-      }
-
-      p, li {
-        font-size: 15px;
-        line-height: 1.7;
-      }
-
-      code {
-        padding: 2px 5px;
-        border-radius: 4px;
-        background: #f6f8fa;
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <h1>Soda(qishui) Music Download / 汽水音乐下载</h1>
-      <p>安装完成。打开汽水音乐分享页后，页面标题右侧会出现“立即下载”按钮。</p>
-      <ul>
-        <li>支持 <code>music.douyin.com/qishui/share/track</code></li>
-        <li>支持 <code>www.qishui.com/share/track</code></li>
-        <li>点击“立即下载”后才会开始下载音频。</li>
-      </ul>
-    </main>
-  </body>
-</html>`;
-    const noticeUrl = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+    const noticeUrl = URL.createObjectURL(new Blob([INSTALL_NOTICE_HTML], { type: "text/html" }));
 
     if (typeof GM_openInTab === "function") {
       GM_openInTab(noticeUrl, { active: true, insert: true });

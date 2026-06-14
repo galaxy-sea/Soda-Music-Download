@@ -3,7 +3,7 @@
 // @name:zh-CN   汽水音乐下载
 // @namespace    https://github.com/
 // @author       ChangJin Wei (魏昌进)
-// @version      2026.614.12037
+// @version      2026.614.12144
 // @description  Add a download button to Qishui share track pages.
 // @homepageURL  https://github.com/galaxy-sea/Soda-Music-Download
 // @supportURL   https://github.com/galaxy-sea/Soda-Music-Download/issues
@@ -221,9 +221,45 @@
   };
 })(globalThis);
 
+
   const pageWindow = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
   const { buildFilename, installDownloadButton } = globalThis.SodaMusicDownloadUtils;
   const NOTICE_SHOWN_KEY = "soda_music_download_install_notice_shown";
+  const INSTALL_NOTICE_HTML = `<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>汽水音乐下载</title>
+</head>
+
+<body>
+  <main>
+    <h1>Soda(qishui) Music Download / 汽水音乐下载</h1>
+    <p>插件安装完成。打开汽水音乐APP，复制分享链接，浏览器打开分享页后，歌曲名 右侧会出现红色“立即下载”按钮。</p>
+    <div style="display: flex; gap: 24px; align-items: flex-start;">
+      <div style="flex: 1;">
+        <p> <img src="https://i.postimg.cc/zG6rMVP6/Angel.webp" alt="测试页面" width="240"> </p>
+        <p>测试地址1: <a href="https://music.douyin.com/qishui/share/track?track_id=7645128283450984475">https://music.douyin.com/qishui/share/track?track_id=7645128283450984475</a></p>
+        <p>测试地址2: <a href="https://www.qishui.com/share/track?track_id=7645128283450984475">https://www.qishui.com/share/track?track_id=7645128283450984475</a></p>
+      </div>
+
+      <div style="flex: 1;">
+        <h2>免责声明</h2>
+        <p>本项目纯粹用于研究插件开发机制和原理，下载的音乐质量真的差劲，只能听个响。</p>
+        <h2>支持作者</h2>
+        <p style="color: red;">开源不易，善良的好人们，行行好施舍点银子给我买包烟吧，一块两块不嫌少三块四块会更好，赠人香烟手有余香。——by：爱抽烟的人</p>
+        <p>
+          <img src="https://i.postimg.cc/mk8vWPht/Ali-Pay.webp" alt="支付宝收款码" width="220">
+          <img src="https://i.postimg.cc/0jcT1zrz/We-Chat-Pay.webp" alt="微信收款码" width="220">
+        </p>
+      </div>
+    </div>
+  </main>
+</body>
+
+</html>`;
 
   function openInstallNoticeOnce() {
     if (typeof GM_getValue !== "function" || typeof GM_setValue !== "function") {
@@ -236,61 +272,7 @@
 
     GM_setValue(NOTICE_SHOWN_KEY, true);
 
-    const html = `<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>汽水音乐下载</title>
-    <style>
-      body {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        color: #1f2328;
-        background: #f6f8fa;
-      }
-
-      main {
-        box-sizing: border-box;
-        width: min(720px, calc(100vw - 32px));
-        margin: 56px auto;
-        padding: 32px;
-        border: 1px solid #d8dee4;
-        border-radius: 8px;
-        background: #fff;
-      }
-
-      h1 {
-        margin: 0 0 8px;
-        font-size: 26px;
-        line-height: 1.3;
-      }
-
-      p, li {
-        font-size: 15px;
-        line-height: 1.7;
-      }
-
-      code {
-        padding: 2px 5px;
-        border-radius: 4px;
-        background: #f6f8fa;
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <h1>Soda(qishui) Music Download / 汽水音乐下载</h1>
-      <p>安装完成。打开汽水音乐分享页后，页面标题右侧会出现“立即下载”按钮。</p>
-      <ul>
-        <li>支持 <code>music.douyin.com/qishui/share/track</code></li>
-        <li>支持 <code>www.qishui.com/share/track</code></li>
-        <li>点击“立即下载”后才会开始下载音频。</li>
-      </ul>
-    </main>
-  </body>
-</html>`;
-    const noticeUrl = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+    const noticeUrl = URL.createObjectURL(new Blob([INSTALL_NOTICE_HTML], { type: "text/html" }));
 
     if (typeof GM_openInTab === "function") {
       GM_openInTab(noticeUrl, { active: true, insert: true });

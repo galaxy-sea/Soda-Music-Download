@@ -1,8 +1,25 @@
 const DOWNLOAD_MESSAGE = "SODA_MUSIC_DOWNLOAD";
+const WELCOME_PAGE = "shared/welcome.html";
 
 if (typeof SodaMusicDownloadUtils === "undefined" && typeof importScripts === "function") {
   importScripts("shared/download-utils.js");
 }
+
+function openWelcomePage() {
+  chrome.tabs.create({
+    url: chrome.runtime.getURL(WELCOME_PAGE),
+  });
+}
+
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason !== "install") {
+    return;
+  }
+
+  openWelcomePage();
+});
+
+chrome.action.onClicked.addListener(openWelcomePage);
 
 function downloadTrack(track) {
   return new Promise((resolve, reject) => {
