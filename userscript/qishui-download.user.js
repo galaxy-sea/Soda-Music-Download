@@ -3,8 +3,9 @@
 // @name:zh-CN   汽水音乐下载
 // @namespace    https://github.com/
 // @author       ChangJin Wei (魏昌进)
-// @version      2026.614.12201
+// @version      2026.614.12253
 // @description  Add a download button to Qishui share track pages.
+// @description:zh-CN 在汽水音乐分享页添加立即下载按钮。
 // @homepageURL  https://github.com/galaxy-sea/Soda-Music-Download
 // @supportURL   https://github.com/galaxy-sea/Soda-Music-Download/issues
 // @updateURL    https://raw.githubusercontent.com/galaxy-sea/Soda-Music-Download/main/userscript/qishui-download.user.js
