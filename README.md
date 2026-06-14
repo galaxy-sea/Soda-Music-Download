@@ -1,7 +1,7 @@
 # Soda-Music-Download
 Soda(qishui) Music Download / 汽水音乐下载，支持 Chrome / Firefox 浏览器扩展和油猴脚本。
 
-<a href="https://chromewebstore.google.com/detail/aeokelcdhpmgdbncehledgoplhahnacm"><img src="./images/Google_Chrome_icon_(February_2022).svg" width="64" height="64"></a><a href="https://addons.mozilla.org/firefox/addon/soda-qishui-music-download/"><img src="./images/Firefox_logo,_2019.svg" width="64" height="64"></a><a href="https://microsoftedge.microsoft.com/addons/detail/hmcacchmdkhhpadohabcoioafojnnmbm"><img src="./images/Microsoft_Edge_logo_(2019).svg" width="64" height="64"></a>
+<a href="https://chromewebstore.google.com/detail/aeokelcdhpmgdbncehledgoplhahnacm"><img src="./images/Google_Chrome_icon_(February_2022).svg" width="64" height="64"></a><a href="https://addons.mozilla.org/firefox/addon/soda-qishui-music-download/"><img src="./images/Firefox_logo_2019.svg" width="64" height="64"></a><a href="https://microsoftedge.microsoft.com/addons/detail/hmcacchmdkhhpadohabcoioafojnnmbm"><img src="./images/Microsoft_Edge_logo_(2019).svg" width="64" height="64"></a>
 
 [![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/aeokelcdhpmgdbncehledgoplhahnacm?style=flat-square)](https://chromewebstore.google.com/detail/aeokelcdhpmgdbncehledgoplhahnacm)
 [![Mozilla Add-on Version](https://img.shields.io/amo/v/soda-qishui-music-download?style=flat-square)](https://addons.mozilla.org/firefox/addon/soda-qishui-music-download/)
