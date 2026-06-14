@@ -3,6 +3,6 @@
     "message": "Soda(qishui) Music Download"
   },
   "extensionDescription": {
-    "message": "Add a download button to Qishui share track pages."
+    "message": "Adds a clear download button to Qishui Music share track pages so you can save the detected audio file with the artist and track name, while keeping the page workflow simple and requiring a manual click before any download starts from supported URLs."
   }
 }

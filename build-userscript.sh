@@ -48,9 +48,9 @@ printf "Generated %s\n" "$OUTPUT"
 printf "Version %s\n" "$VERSION"
 printf "Used shared code from %s\n" "$EXTENSION_SHARED"
 
+rm -rf "$DIST_DIR"
 mkdir -p "$DIST_DIR"
 
-rm -rf "$CHROME_EXTENSION_DIR"
 mkdir -p "$CHROME_EXTENSION_DIR"
 cp -R "$EXTENSION_DIR/." "$CHROME_EXTENSION_DIR/"
 write_manifest "$CHROME_MANIFEST_TEMPLATE" "$EXTENSION_MANIFEST"
@@ -65,7 +65,6 @@ rm -f "$CHROME_EXTENSION_DIR/manifest.chrome.json" "$CHROME_EXTENSION_DIR/manife
 )
 cleanup_manifest
 
-rm -rf "$FIREFOX_EXTENSION_DIR"
 mkdir -p "$FIREFOX_EXTENSION_DIR"
 cp -R "$EXTENSION_DIR/." "$FIREFOX_EXTENSION_DIR/"
 write_manifest "$FIREFOX_MANIFEST_TEMPLATE" "$FIREFOX_EXTENSION_DIR/manifest.json"
