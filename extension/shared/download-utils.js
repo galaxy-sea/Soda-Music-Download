@@ -1,0 +1,196 @@
+(function (globalScope) {
+  "use strict";
+
+  const DOWNLOAD_BUTTON_ID = "soda-music-download-button";
+  const DEFAULT_MAX_ATTEMPTS = 120;
+  const DEFAULT_INTERVAL_MS = 500;
+
+  function sanitizeFilenamePart(value) {
+    return String(value || "")
+      .trim()
+      .replace(/[\\/:*?"<>|]/g, "_")
+      .replace(/\s+/g, " ")
+      .replace(/^\.+$/, "")
+      .slice(0, 120);
+  }
+
+  function inferExtension(audioUrl) {
+    try {
+      const parsedUrl = new URL(audioUrl);
+      const pathExtension = parsedUrl.pathname.match(/\.(mp3|m4a|mp4|flac|wav|ogg|aac|opus)$/i)?.[0];
+      if (pathExtension) {
+        return pathExtension.toLowerCase();
+      }
+
+      const mimeType = parsedUrl.searchParams.get("mime_type") || "";
+      if (/audio_mp4|audio\/mp4|mp4/i.test(mimeType)) {
+        return ".m4a";
+      }
+      if (/mpeg|mp3/i.test(mimeType)) {
+        return ".mp3";
+      }
+      if (/flac/i.test(mimeType)) {
+        return ".flac";
+      }
+      if (/wav/i.test(mimeType)) {
+        return ".wav";
+      }
+      if (/ogg/i.test(mimeType)) {
+        return ".ogg";
+      }
+    } catch {
+      // Fall through to the default extension.
+    }
+
+    return ".m4a";
+  }
+
+  function buildFilename(track) {
+    const artistName = sanitizeFilenamePart(track.artistName) || "Unknown Artist";
+    const trackName = sanitizeFilenamePart(track.trackName) || "Unknown Track";
+    const audioUrl = track.url;
+    const extension = inferExtension(audioUrl);
+    return `${artistName}-${trackName}${extension}`;
+  }
+
+  function readTrack(pageWindow) {
+    const option =
+      pageWindow._ROUTER_DATA?.loaderData?.track_page?.audioWithLyricsOption;
+
+    if (!option?.url) {
+      return null;
+    }
+
+    return {
+      url: option.url,
+      artistName: option.artistName || "Unknown Artist",
+      trackName: option.trackName || "Unknown Track",
+    };
+  }
+
+  function createDownloadButton(onClick) {
+    const button = document.createElement("span");
+    button.id = DOWNLOAD_BUTTON_ID;
+    button.textContent = "立即下载";
+    button.title = "下载当前歌曲";
+    button.style.cssText = [
+      "display:inline-flex",
+      "align-items:center",
+      "margin-left:12px",
+      "padding:4px 10px",
+      "border-radius:4px",
+      "background:#ff2c55",
+      "color:#fff",
+      "font-size:14px",
+      "font-weight:500",
+      "line-height:20px",
+      "cursor:pointer",
+      "vertical-align:middle",
+      "user-select:none",
+    ].join(";");
+
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      onClick(event);
+    });
+
+    return button;
+  }
+
+  function installDownloadButton(options) {
+    const {
+      onDownload,
+      pageWindow = globalScope,
+      maxAttempts = DEFAULT_MAX_ATTEMPTS,
+      intervalMs = DEFAULT_INTERVAL_MS,
+      preventDuplicate = false,
+    } = options;
+    const seenAudioUrls = new Set();
+    let attempts = 0;
+    let scheduled = false;
+    let retryTimer = null;
+
+    function handleClick() {
+      const track = readTrack(pageWindow);
+      if (!track) {
+        globalScope.alert("音频信息尚未加载，请稍后再试。");
+        return;
+      }
+
+      if (preventDuplicate && seenAudioUrls.has(track.url)) {
+        return;
+      }
+
+      seenAudioUrls.add(track.url);
+      onDownload(track);
+    }
+
+    function findTitle() {
+      return document.querySelector(".track-title h1") || document.querySelector("h1");
+    }
+
+    function ensureDownloadButton() {
+      scheduled = false;
+
+      const title = findTitle();
+      const existingButton = document.getElementById(DOWNLOAD_BUTTON_ID);
+
+      if (!title) {
+        existingButton?.remove();
+        return false;
+      }
+
+      if (existingButton?.previousElementSibling === title) {
+        return true;
+      }
+
+      existingButton?.remove();
+      title.insertAdjacentElement("afterend", createDownloadButton(handleClick));
+      return true;
+    }
+
+    function scheduleEnsureDownloadButton() {
+      if (scheduled) {
+        return;
+      }
+
+      scheduled = true;
+      globalScope.setTimeout(ensureDownloadButton, 50);
+    }
+
+    const observer = new MutationObserver(scheduleEnsureDownloadButton);
+    observer.observe(document.documentElement || document, {
+      childList: true,
+      subtree: true,
+    });
+
+    function retryInsertDownloadButton() {
+      attempts += 1;
+
+      if (ensureDownloadButton() || attempts >= maxAttempts) {
+        globalScope.clearInterval(retryTimer);
+      }
+    }
+
+    retryTimer = globalScope.setInterval(retryInsertDownloadButton, intervalMs);
+    retryInsertDownloadButton();
+
+    return {
+      disconnect() {
+        observer.disconnect();
+        globalScope.clearInterval(retryTimer);
+      },
+      refresh: ensureDownloadButton,
+    };
+  }
+
+  globalScope.SodaMusicDownloadUtils = {
+    sanitizeFilenamePart,
+    inferExtension,
+    buildFilename,
+    readTrack,
+    installDownloadButton,
+  };
+})(globalThis);
