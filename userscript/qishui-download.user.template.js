@@ -7,6 +7,7 @@
 // @version      0.1.0
 // @description  Add a download button to Qishui share track pages.
 // @description:zh-CN 在汽水音乐分享页添加立即下载按钮。
+// @homepage     https://github.com/galaxy-sea/Soda-Music-Download
 // @homepageURL  https://github.com/galaxy-sea/Soda-Music-Download
 // @supportURL   https://github.com/galaxy-sea/Soda-Music-Download/issues
 // @updateURL    https://raw.githubusercontent.com/galaxy-sea/Soda-Music-Download/main/userscript/qishui-download.user.js
