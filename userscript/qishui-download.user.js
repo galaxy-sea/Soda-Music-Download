@@ -5,9 +5,10 @@
 // @author       ChangJin Wei (魏昌进)
 // @website      https://wcj.plus/
 // @license      Apache-2.0
-// @version      2026.624.10017
+// @version      2026.624.10111
 // @description  Add a download button to Qishui share track pages.
 // @description:zh-CN 在汽水音乐分享页添加立即下载按钮。
+// @icon         https://raw.githubusercontent.com/galaxy-sea/Soda-Music-Download/main/extension/icons/icon120.png
 // @homepage     https://github.com/galaxy-sea/Soda-Music-Download
 // @homepageURL  https://github.com/galaxy-sea/Soda-Music-Download
 // @supportURL   https://github.com/galaxy-sea/Soda-Music-Download/issues
