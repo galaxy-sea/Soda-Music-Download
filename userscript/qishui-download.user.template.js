@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         Soda(qishui) Music Download
 // @name:zh-CN   汽水音乐下载
-// @namespace    https://github.com/
+// @namespace    https://github.com/galaxy-sea/Soda-Music-Download
 // @author       ChangJin Wei (魏昌进)
+// @website      https://wcj.plus/
 // @license      Apache-2.0
 // @version      0.1.0
 // @description  Add a download button to Qishui share track pages.
