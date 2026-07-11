@@ -53,10 +53,21 @@
     return `${artistName}-${trackName}${extension}`;
   }
 
-  function readTrack(pageWindow) {
-    const option =
-      pageWindow._ROUTER_DATA?.loaderData?.track_page?.audioWithLyricsOption;
+  function buildTrackLoaderUrl(pageUrl) {
+    const parsedUrl = new URL(pageUrl);
+    const trackId = parsedUrl.searchParams.get("track_id");
+    if (!trackId) {
+      return "";
+    }
 
+    const loaderUrl = new URL("https://music.douyin.com/qishui/share/track");
+    loaderUrl.searchParams.set("track_id", trackId);
+    loaderUrl.searchParams.set("__loader", "track_page");
+    loaderUrl.searchParams.set("__ssrDirect", "true");
+    return loaderUrl.toString();
+  }
+
+  function normalizeTrack(option) {
     if (!option?.url) {
       return null;
     }
@@ -66,6 +77,49 @@
       artistName: option.artistName || "Unknown Artist",
       trackName: option.trackName || "Unknown Track",
     };
+  }
+
+  function findAudioWithLyricsOption(value) {
+    if (!value || typeof value !== "object") {
+      return null;
+    }
+
+    if (value.audioWithLyricsOption?.url) {
+      return value.audioWithLyricsOption;
+    }
+
+    if (value.url && (value.artistName || value.trackName)) {
+      return value;
+    }
+
+    for (const childValue of Object.values(value)) {
+      const option = findAudioWithLyricsOption(childValue);
+      if (option) {
+        return option;
+      }
+    }
+
+    return null;
+  }
+
+  function parseJsonText(text) {
+    const trimmedText = String(text || "").trim().replace(/^\)\]\}',?\s*/, "");
+    return JSON.parse(trimmedText);
+  }
+
+  function parseTrackLoaderText(text) {
+    const payload = parseJsonText(text);
+    return normalizeTrack(findAudioWithLyricsOption(payload));
+  }
+
+  async function fetchTrackFromLoader(pageWindow, requestText) {
+    const loaderUrl = buildTrackLoaderUrl(pageWindow.location.href);
+    if (!loaderUrl) {
+      return null;
+    }
+
+    const text = await requestText(loaderUrl);
+    return parseTrackLoaderText(text);
   }
 
   function createDownloadButton(onClick) {
@@ -103,6 +157,14 @@
     const {
       onDownload,
       pageWindow = globalScope,
+      loadTrack = () =>
+        fetchTrackFromLoader(pageWindow, async (loaderUrl) => {
+          const response = await fetch(loaderUrl, { credentials: "include" });
+          if (!response.ok) {
+            throw new Error(`Loader request failed: ${response.status}`);
+          }
+          return response.text();
+        }),
       maxAttempts = DEFAULT_MAX_ATTEMPTS,
       intervalMs = DEFAULT_INTERVAL_MS,
       preventDuplicate = false,
@@ -112,10 +174,22 @@
     let scheduled = false;
     let retryTimer = null;
 
-    function handleClick() {
-      const track = readTrack(pageWindow);
+    async function handleClick(event) {
+      const button = event.currentTarget;
+      const originalText = button.textContent;
+      button.textContent = "获取中...";
+
+      let track = null;
+      try {
+        track = await loadTrack();
+      } catch (error) {
+        console.error("[Soda(qishui) Music Download] Failed to load track:", error);
+      } finally {
+        button.textContent = originalText;
+      }
+
       if (!track) {
-        globalScope.alert("音频信息尚未加载，请稍后再试。");
+        globalScope.alert("音频信息获取失败，请稍后再试。");
         return;
       }
 
@@ -190,7 +264,9 @@
     sanitizeFilenamePart,
     inferExtension,
     buildFilename,
-    readTrack,
+    buildTrackLoaderUrl,
+    parseTrackLoaderText,
+    fetchTrackFromLoader,
     installDownloadButton,
   };
 })(globalThis);

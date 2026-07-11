@@ -21,6 +21,7 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_openInTab
+// @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
 // @connect      *
 // ==/UserScript==
@@ -32,7 +33,7 @@
   __DOWNLOAD_UTILS__
 
   const pageWindow = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
-  const { buildFilename, installDownloadButton } = globalThis.SodaMusicDownloadUtils;
+  const { buildFilename, fetchTrackFromLoader, installDownloadButton } = globalThis.SodaMusicDownloadUtils;
   const NOTICE_SHOWN_KEY = "soda_music_download_install_notice_shown";
   const INSTALL_NOTICE_HTML = __INSTALL_NOTICE_HTML__;
 
@@ -73,8 +74,36 @@
     });
   }
 
+  function requestText(loaderUrl) {
+    if (typeof GM_xmlhttpRequest !== "function") {
+      return fetch(loaderUrl, { credentials: "include" }).then((response) => {
+        if (!response.ok) {
+          throw new Error(`Loader request failed: ${response.status}`);
+        }
+        return response.text();
+      });
+    }
+
+    return new Promise((resolve, reject) => {
+      GM_xmlhttpRequest({
+        method: "GET",
+        url: loaderUrl,
+        onload: (response) => {
+          if (response.status < 200 || response.status >= 300) {
+            reject(new Error(`Loader request failed: ${response.status}`));
+            return;
+          }
+          resolve(response.responseText);
+        },
+        onerror: () => reject(new Error("Loader request failed.")),
+        ontimeout: () => reject(new Error("Loader request timed out.")),
+      });
+    });
+  }
+
   installDownloadButton({
     pageWindow,
+    loadTrack: () => fetchTrackFromLoader(pageWindow, requestText),
     preventDuplicate: true,
     onDownload: download,
   });
